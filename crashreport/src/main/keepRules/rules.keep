@@ -1,0 +1,5 @@
+# CrashReportKit public API
+-keep class com.kit.crashreport.CrashReport { *; }
+-keep class com.kit.crashreport.CrashReportConfig { *; }
+-keep class com.kit.crashreport.CrashBackend { *; }
+-keep interface com.kit.crashreport.CrashReporter { *; }
