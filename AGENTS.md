@@ -38,11 +38,21 @@ CrashReportKit/
 │       └── internal/     # Firebase / NoOp 等适配器
 ├── sample/               # 演示；applicationId = com.kit.crashreport.sample
 ├── gradle/libs.versions.toml
+├── jitpack.yml           # JitPack：JDK17 + 只 publish :crashreport
 ├── README.md
 └── AGENTS.md
 ```
 
 ## 改动指引
+
+### 发布 / JitPack
+
+- 只发布 `:crashreport`；`sample` 不进 Maven 产物。
+- 坐标由 GitHub 路径决定：`com.github.e-hai.CrashReportKit:crashreport:<Tag>`。
+- 版本：`VERSION` 环境变量（JitPack Tag）优先，否则 `gradle.properties` 的 `VERSION_NAME`；会去掉 `v`/`V` 前缀。
+- 改发布元数据只动 `crashreport/build.gradle.kts` 的 `publishing {}` 与根目录 `jitpack.yml`。
+- 本地校验：`./gradlew :crashreport:publishToMavenLocal -Dorg.gradle.configuration-cache=false`。
+- 不要在 `:crashreport` 上应用 `google-services` / `firebase-crashlytics` Gradle 插件。
 
 ### 改 SDK 行为
 
@@ -84,9 +94,10 @@ CrashReportKit/
 ```bash
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 ./gradlew :crashreport:assembleDebug :sample:assembleDebug :crashreport:testDebugUnitTest
+./gradlew :crashreport:publishToMavenLocal -Dorg.gradle.configuration-cache=false
 ```
 
-最小回归：库能编过；sample 能编过；`CrashReportTest` 用假 `CrashReporter` 覆盖门面转发。
+最小回归：库能编过；sample 能编过；`CrashReportTest` 用假 `CrashReporter` 覆盖门面转发；`publishToMavenLocal` 成功（`~/.m2/repository/com/github/e-hai/crashreport/`）。
 
 ## 不要做的事
 

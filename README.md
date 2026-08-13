@@ -86,12 +86,18 @@ crashreport/src/main/java/com/kit/crashreport/
 
 ## 快速开始
 
-### 1. 依赖 SDK
+### 1. 通过 JitPack 依赖（推荐）
 
 `settings.gradle.kts`：
 
 ```kotlin
-include(":crashreport")
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
 ```
 
 App `build.gradle.kts`：
@@ -104,14 +110,22 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":crashreport"))
-    // 可选：崩溃自由用户等指标
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
+    // 多模块仓库：指定 crashreport 模块
+    implementation("com.github.e-hai.CrashReportKit:crashreport:Tag")
+    // 将 Tag 换成 Git tag，例如 1.0.0 或 v1.0.0（与发布 tag 一致）
+
+    implementation(platform("com.google.firebase:firebase-bom:34.17.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }
 ```
 
-根工程需声明插件（已在本仓库 `build.gradle.kts` 中）：
+源码依赖（本仓库开发）：
+
+```kotlin
+implementation(project(":crashreport"))
+```
+
+根工程需声明插件：
 
 ```kotlin
 plugins {
@@ -184,6 +198,31 @@ Sample 提供三个按钮：Log breadcrumb、Record non-fatal、Force fatal cras
 
 ---
 
+## 发布到 JitPack
+
+仓库已配置 `maven-publish` + `jitpack.yml`，只发布 `:crashreport`。
+
+| 项 | 值 |
+|----|-----|
+| GitHub | [e-hai/CrashReportKit](https://github.com/e-hai/CrashReportKit) |
+| 坐标 | `com.github.e-hai.CrashReportKit:crashreport:<Tag>` |
+| 本地校验 | `./gradlew :crashreport:publishToMavenLocal` |
+
+步骤：
+
+1. 推送代码到 GitHub。
+2. 打 tag 并推送，例如：
+   ```bash
+   git tag 1.0.0
+   git push origin 1.0.0
+   ```
+3. 打开 [jitpack.io/#e-hai/CrashReportKit](https://jitpack.io/#e-hai/CrashReportKit)，选中对应 Tag，等待绿色构建成功。
+4. 宿主按上文「通过 JitPack 依赖」接入。
+
+版本号：优先读 JitPack 环境变量 `VERSION`（即 Git Tag，会去掉前缀 `v`）；本地默认用 `gradle.properties` 的 `VERSION_NAME`。
+
+---
+
 ## API 一览
 
 | API | 说明 |
@@ -222,6 +261,7 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"  
 ./gradlew :crashreport:assembleDebug
 ./gradlew :sample:assembleDebug
 ./gradlew :crashreport:testDebugUnitTest
+./gradlew :crashreport:publishToMavenLocal
 ```
 
 ---

@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
+    `maven-publish`
 }
+
+group = providers.gradleProperty("GROUP_ID").getOrElse("com.github.e-hai")
+version = resolvePublishVersion()
 
 android {
     namespace = "com.kit.crashreport"
@@ -18,6 +22,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -31,4 +41,50 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = project.group.toString()
+            artifactId = providers.gradleProperty("ARTIFACT_ID").getOrElse("crashreport")
+            version = project.version.toString()
+
+            afterEvaluate {
+                from(components["release"])
+            }
+
+            pom {
+                name.set("CrashReportKit")
+                description.set("Android crash reporting SDK facade (Firebase Crashlytics backend).")
+                url.set("https://github.com/e-hai/CrashReportKit")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("e-hai")
+                        name.set("e-hai")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/e-hai/CrashReportKit.git")
+                    developerConnection.set("scm:git:ssh://github.com/e-hai/CrashReportKit.git")
+                    url.set("https://github.com/e-hai/CrashReportKit")
+                }
+            }
+        }
+    }
+}
+
+fun resolvePublishVersion(): String {
+    val fromEnv = System.getenv("VERSION")
+    val raw = when {
+        !fromEnv.isNullOrBlank() -> fromEnv
+        else -> providers.gradleProperty("VERSION_NAME").orNull ?: "1.0.0"
+    }
+    return raw.removePrefix("v").removePrefix("V")
 }

@@ -1,0 +1,4 @@
+jdk:
+  - openjdk17
+install:
+  - ./gradlew clean :crashreport:publishToMavenLocal -Dorg.gradle.configuration-cache=false --no-daemon --stacktrace
