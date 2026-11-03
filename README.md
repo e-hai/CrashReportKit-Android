@@ -1,4 +1,7 @@
-# CrashReportKit
+# CrashReportKit (Android)
+
+> **分支说明**：当前分支为 **`android`** 分支，提供 Android 平台 SDK 及示例工程。<br/>
+> 🌐 **多平台架构总览与导航门户** 请见 [main 分支](../../tree/main) ｜ 🍏 **iOS 实现** 请见 [ios 分支](../../tree/ios)
 
 Android 崩溃上报 SDK。业务侧只依赖统一门面 `CrashReport`，底层上报通道可替换。当前临时接入 **Firebase Crashlytics**。
 
