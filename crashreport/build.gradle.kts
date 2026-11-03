@@ -55,9 +55,9 @@ publishing {
             }
 
             pom {
-                name.set("CrashReportKit")
+                name.set("CrashReportKit-Android")
                 description.set("Android crash reporting SDK facade (Firebase Crashlytics backend).")
-                url.set("https://github.com/e-hai/CrashReportKit")
+                url.set("https://github.com/e-hai/CrashReportKit-Android")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
@@ -71,9 +71,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/e-hai/CrashReportKit.git")
-                    developerConnection.set("scm:git:ssh://github.com/e-hai/CrashReportKit.git")
-                    url.set("https://github.com/e-hai/CrashReportKit")
+                    connection.set("scm:git:git://github.com/e-hai/CrashReportKit-Android.git")
+                    developerConnection.set("scm:git:ssh://github.com/e-hai/CrashReportKit-Android.git")
+                    url.set("https://github.com/e-hai/CrashReportKit-Android")
                 }
             }
         }

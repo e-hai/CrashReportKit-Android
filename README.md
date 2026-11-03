@@ -1,7 +1,7 @@
-# CrashReportKit (Android)
+# CrashReportKit-Android
 
-> **分支说明**：当前分支为 **`android`** 分支，提供 Android 平台 SDK 及示例工程。<br/>
-> 🌐 **多平台架构总览与导航门户** 请见 [main 分支](../../tree/main) ｜ 🍏 **iOS 实现** 请见 [ios 分支](../../tree/ios)
+> **Android 平台 SDK 及示例工程仓库**  
+> 🍏 **iOS 仓库** 请见 [CrashReportKit-iOS](https://github.com/e-hai/CrashReportKit-iOS) ｜ 🌐 **多平台架构总览** 请见 [CrashReportKit](https://github.com/e-hai/CrashReportKit)
 
 Android 崩溃上报 SDK。业务侧只依赖统一门面 `CrashReport`，底层上报通道可替换。当前临时接入 **Firebase Crashlytics**。
 
@@ -114,7 +114,7 @@ plugins {
 
 dependencies {
     // 多模块仓库：指定 crashreport 模块
-    implementation("com.github.e-hai.CrashReportKit:crashreport:Tag")
+    implementation("com.github.e-hai.CrashReportKit-Android:crashreport:Tag")
     // 将 Tag 换成 Git tag，例如 1.0.0 或 v1.0.0（与发布 tag 一致）
 
     implementation(platform("com.google.firebase:firebase-bom:34.17.0"))

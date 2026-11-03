@@ -4,7 +4,7 @@
 
 ## 项目是什么
 
-- **CrashReportKit**：Android 崩溃上报 SDK。
+- **CrashReportKit-Android**：Android 崩溃上报 SDK 仓库。
 - 模块：
   - `:crashreport` — 对外库（门面 + 后端适配）。
   - `:sample` — 演示 App，不是发布产物。
@@ -48,7 +48,7 @@ CrashReportKit/
 ### 发布 / JitPack
 
 - 只发布 `:crashreport`；`sample` 不进 Maven 产物。
-- 坐标由 GitHub 路径决定：`com.github.e-hai.CrashReportKit:crashreport:<Tag>`。
+- 坐标由 GitHub 路径决定：`com.github.e-hai.CrashReportKit-Android:crashreport:<Tag>`。
 - 版本：`VERSION` 环境变量（JitPack Tag）优先，否则 `gradle.properties` 的 `VERSION_NAME`；会去掉 `v`/`V` 前缀。
 - 改发布元数据只动 `crashreport/build.gradle.kts` 的 `publishing {}` 与根目录 `jitpack.yml`。
 - 本地校验：`./gradlew :crashreport:publishToMavenLocal -Dorg.gradle.configuration-cache=false`。
