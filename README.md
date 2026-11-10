@@ -122,7 +122,7 @@ plugins {
 
 dependencies {
     // CrashReportKit 核心库
-    implementation("com.github.e-hai.CrashReportKit-Android:crashreport:1.0.0")
+    implementation("com.github.e-hai.CrashReportKit-Android:crashreport:1.0.1")
 
     // Firebase BOM（由宿主主导版本控制，推荐与本库保持一致）
     implementation(platform("com.google.firebase:firebase-bom:34.17.0"))
@@ -139,7 +139,7 @@ plugins {
 }
 
 dependencies {
-    implementation 'com.github.e-hai.CrashReportKit-Android:crashreport:1.0.0'
+    implementation 'com.github.e-hai.CrashReportKit-Android:crashreport:1.0.1'
     implementation platform('com.google.firebase:firebase-bom:34.17.0')
     implementation 'com.google.firebase:firebase-analytics'
 }
