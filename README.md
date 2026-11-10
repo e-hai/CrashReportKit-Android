@@ -178,7 +178,10 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // 初始化 CrashReportKit
+        // 方式 1：标准初始化（完全向后兼容）
+        // CrashReport.init(this)
+
+        // 方式 2：带配置与回调感知（推荐：支持尾随 Lambda，可精准感知未配置或异常原因）
         CrashReport.init(
             context = this,
             config = CrashReportConfig(
@@ -186,7 +189,14 @@ class MainApplication : Application() {
                 collectionEnabled = true,          // 是否允许上报数据（可随隐私政策同意状态动态更新）
                 backend = CrashBackend.FIREBASE     // 指定底层上报通道
             )
-        )
+        ) { result ->
+            if (result.isReady) {
+                // 初始化成功，采集正常工作中
+            } else {
+                // 若缺少 google-services.json 等配置，SDK 会自动安全降级为 NoOp 保证 App 绝不闪退，并输出具体原因
+                android.util.Log.w("CrashReport", "CrashReport 未就绪: status=${result.status}, msg=${result.message}", result.cause)
+            }
+        }
 
         // 设置全局通用用户上下文
         CrashReport.setUserId("user_8848")
@@ -244,7 +254,8 @@ CrashReport.recordException(new RuntimeException("Sample Java non-fatal error"))
 
 | 方法签名 | 说明 | 适用场景 |
 |:---|:---|:---|
-| `init(context, config = CrashReportConfig())` | 初始化 SDK 门面 | `Application.onCreate` |
+| `init(context, config, callback = null)` | 初始化 SDK 门面（支持可选回调获取结果） | `Application.onCreate` |
+| `getStatus(): CrashReportStatus` | 获取当前状态（`NOT_INITIALIZED` / `READY` / `DISABLED` / `FAILED`） | 诊断排查、状态感知 |
 | `isInitialized(): Boolean` | 检查门面是否已完成初始化 | 运行时检查 |
 | `setCollectionEnabled(enabled: Boolean)` | 动态切换是否允许向云端上报日志与异常 | 个人隐私与 GDPR 合规合规切换 |
 | `setUserId(userId: String?)` | 绑定发生崩溃时的用户标识（传 null/空串解绑） | 用户登录/注销 |

@@ -3,3 +3,6 @@
 -keep class com.kit.crashreport.CrashReportConfig { *; }
 -keep class com.kit.crashreport.CrashBackend { *; }
 -keep interface com.kit.crashreport.CrashReporter { *; }
+-keep class com.kit.crashreport.CrashReportStatus { *; }
+-keep class com.kit.crashreport.CrashReportInitResult { *; }
+-keep interface com.kit.crashreport.CrashReportInitCallback { *; }
