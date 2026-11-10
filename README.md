@@ -250,6 +250,27 @@ CrashReport.recordException(new RuntimeException("Sample Java non-fatal error"))
 
 ---
 
+### 3. 初始化状态与诊断机制 (CrashReportStatus)
+
+SDK 具备严格的 **Fail-Safe（防崩安全降级）** 机制。当调用者未配置、配置错误或缺少第三方配置文件时，SDK 保证主流程绝对安全不崩溃，并通过结构化状态透出：
+
+| 状态枚举值 | 说明 | 底层动作 | 是否上传数据 |
+|:---|:---|:---|:---:|
+| `NOT_INITIALIZED` | 尚未调用 `CrashReport.init(...)` | 业务调用自动走向安全 NoOp，并在控制台输出限频警告 | 否 |
+| `READY` | 初始化成功 | 正常转发给底层适配器（如 Firebase Crashlytics） | 是 |
+| `DISABLED` | 配置中设置了 `enabled = false` | 走内部 NoOp，所有方法直接空返回 | 否 |
+| `FAILED` | 初始化遇到异常（如缺少 `google-services.json`） | 自动降级为 NoOp 避免应用崩溃，并通过回调返回异常 `cause` | 否 |
+
+```kotlin
+// 随时随地检查当前 SDK 健康状态
+val status: CrashReportStatus = CrashReport.getStatus()
+if (status == CrashReportStatus.READY) {
+    // 监控链路完全就绪
+}
+```
+
+---
+
 ## 📋 API 详细参考
 
 | 方法签名 | 说明 | 适用场景 |

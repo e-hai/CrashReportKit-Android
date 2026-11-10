@@ -25,17 +25,30 @@
 - **公共包名**：`com.kit.crashreport`
 - **内部包名**：`com.kit.crashreport.internal`（宿主代码不可见，禁止将 internal 类型作为公开 API 返回值）。
 
+## 核心设计与防崩规范（Fail-Safe）
+
+1. **绝对防崩原则**：
+   - 监控 SDK 绝不能因为第三方配置异常（如缺少 `google-services.json`、FirebaseApp 未配置等）导致宿主 App 崩溃。
+   - `init` 初始化阶段必须执行 `try-catch` 保护，遇到异常时自动安全降级为 `NoOpCrashReporter`，状态标记为 `FAILED`，并通过日志和回调透出异常信息。
+2. **向后兼容性**：
+   - `CrashReport.init` 必须通过 `@JvmOverloads` 保证原有无回调调用的二进制与源码兼容性。
+   - 对外公共方法均添加 `@JvmStatic` 保障 Java 语言调用体验。
+3. **未初始化限频告警**：
+   - 当调用者漏调 `init` 直接调用 `log` / `recordException` 等方法时，必须执行安全 NoOp，并通过 `AtomicBoolean` 打印限频控制台警告（仅告警一次），避免日志刷屏。
+
 ## 目录地图
 
 ```text
 CrashReportKit-Android/
 ├── crashreport/          # SDK 核心库
+│   ├── consumer-rules.pro        # 自动导出的混淆规则（Keep 门面与公共类）
 │   └── src/main/java/com/kit/crashreport/
 │       ├── CrashReport.kt        # 对外统一门面
 │       ├── CrashReportConfig.kt  # 初始化参数模型
 │       ├── CrashBackend.kt       # 后端通道枚举
 │       ├── CrashReporter.kt      # 底层统一契约接口
-│       └── internal/             # 厂商具体适配器 (Firebase / NoOp)
+│       ├── CrashReportStatus.kt  # 状态枚举 (NOT_INITIALIZED/READY/DISABLED/FAILED) 与回调接口
+│       └── internal/             # 内部适配器 (Firebase / NoOp) 与安全日志 (CrashLogger)
 ├── sample/               # 演示工程；applicationId = com.kit.crashreport.sample
 ├── gradle/libs.versions.toml
 ├── jitpack.yml           # JitPack 构建声明：JDK 17 + 发布 :crashreport
@@ -70,7 +83,7 @@ CrashReportKit-Android/
 ## 验证命令
 
 ```bash
-# 构建检查与测试
+# 构建检查与测试（必须保证全部通过）
 ./gradlew :crashreport:assembleDebug :sample:assembleDebug :crashreport:testDebugUnitTest
 
 # 校验本地 Maven 发布
