@@ -21,16 +21,25 @@
 
 ### 步骤 1：配置仓库与声明依赖
 
-1. 在宿主 `settings.gradle.kts` 中添加 JitPack 仓库：
+1. 在宿主 `settings.gradle.kts` 中添加 GitHub Packages 仓库与凭据配置（拉取需要 GitHub PAT 权限 `read:packages`）：
    ```kotlin
    dependencyResolutionManagement {
        repositories {
            google()
            mavenCentral()
-           maven { url = uri("https://jitpack.io") }
+           maven {
+               name = "GitHubPackages"
+               url = uri("https://maven.pkg.github.com/e-hai/CrashReportKit-Android")
+               credentials {
+                   username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR") ?: System.getenv("GITHUB_USER")
+                   password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+               }
+           }
        }
    }
    ```
+   > 💡 开发者本地凭据建议配置在 `~/.gradle/gradle.properties`（`gpr.user=...`, `gpr.key=ghp_...`），CI 环境通过环境变量 `GITHUB_TOKEN` 自动注入。
+
 2. 在宿主 `app/build.gradle.kts` 中引入 SDK 依赖与 Firebase 官方插件：
    ```kotlin
    plugins {
@@ -40,8 +49,8 @@
    }
 
    dependencies {
-       // CrashReportKit 核心门面
-       implementation("com.github.e-hai.CrashReportKit-Android:crashreport:1.0.1")
+       // CrashReportKit 核心门面 (GitHub Packages)
+       implementation("com.github.e-hai:crashreport:1.0.1")
 
        // Firebase BOM
        implementation(platform("com.google.firebase:firebase-bom:34.17.0"))

@@ -1,6 +1,6 @@
 # CrashReportKit-Android
 
-[![JitPack](https://jitpack.io/v/e-hai/CrashReportKit-Android.svg)](https://jitpack.io/#e-hai/CrashReportKit-Android)
+[![GitHub Release](https://img.shields.io/github/v/release/e-hai/CrashReportKit-Android?color=blue&label=GitHub%20Packages)](https://github.com/e-hai/CrashReportKit-Android/packages)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com)
 [![MinSdk](https://img.shields.io/badge/MinSdk-24-orange.svg)](https://developer.android.com)
@@ -81,28 +81,67 @@ sequenceDiagram
 
 ## 📦 接入依赖
 
-### 1. 配置 JitPack 仓库
+> 💡 **从 JitPack 迁移提示**：  
+> 本库现已正式迁移至 **GitHub Packages** 托管。原 JitPack 坐标 `com.github.e-hai.CrashReportKit-Android:crashreport` 已废弃，请使用标准 Maven 坐标 `com.github.e-hai:crashreport`。
 
-#### Kotlin DSL (`settings.gradle.kts`)：
+### 1. 配置 GitHub Packages 仓库与凭据
+
+由于 GitHub Packages 要求拉取依赖时必须进行身份认证（即使是公开包），开发者或 CI 环境需配置个人访问令牌（PAT）：
+
+#### 步骤 A：获取 GitHub Personal Access Token (PAT)
+1. 访问 GitHub [Personal Access Tokens (classic)](https://github.com/settings/tokens) 页面。
+2. 点击 **Generate new token (classic)**。
+3. 勾选 **`read:packages`** 权限（下载包只需该只读权限）。
+4. 生成并复制该 Token（形如 `ghp_xxxx`）。
+
+#### 步骤 B：安全配置凭据（避免硬编码至代码仓库）
+推荐在开发者本机的全局 Gradle 属性文件 `~/.gradle/gradle.properties` 中添加（对所有项目生效，不进 Git）：
+```properties
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=ghp_YOUR_PERSONAL_ACCESS_TOKEN
+```
+或通过系统环境变量配置（常用于 CI/CD，GitHub Actions 默认内置 `${{ secrets.GITHUB_TOKEN }}`）：
+```bash
+export GITHUB_ACTOR="YOUR_GITHUB_USERNAME"
+export GITHUB_TOKEN="ghp_YOUR_PERSONAL_ACCESS_TOKEN"
+```
+
+#### 步骤 C：在宿主工程中声明仓库
+
+##### Kotlin DSL (`settings.gradle.kts`)：
 ```kotlin
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/e-hai/CrashReportKit-Android")
+            credentials {
+                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR") ?: System.getenv("GITHUB_USER")
+                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 ```
 
-#### Groovy DSL (`settings.gradle`)：
+##### Groovy DSL (`settings.gradle`)：
 ```groovy
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        maven {
+            name = 'GitHubPackages'
+            url = uri('https://maven.pkg.github.com/e-hai/CrashReportKit-Android')
+            credentials {
+                username = providers.gradleProperty('gpr.user').orNull ?: System.getenv('GITHUB_ACTOR') ?: System.getenv('GITHUB_USER')
+                password = providers.gradleProperty('gpr.key').orNull ?: System.getenv('GITHUB_TOKEN')
+            }
+        }
     }
 }
 ```
@@ -121,8 +160,8 @@ plugins {
 }
 
 dependencies {
-    // CrashReportKit 核心库
-    implementation("com.github.e-hai.CrashReportKit-Android:crashreport:1.0.1")
+    // CrashReportKit 核心库（GitHub Packages）
+    implementation("com.github.e-hai:crashreport:1.0.1")
 
     // Firebase BOM（由宿主主导版本控制，推荐与本库保持一致）
     implementation(platform("com.google.firebase:firebase-bom:34.17.0"))
@@ -139,7 +178,7 @@ plugins {
 }
 
 dependencies {
-    implementation 'com.github.e-hai.CrashReportKit-Android:crashreport:1.0.1'
+    implementation 'com.github.e-hai:crashreport:1.0.1'
     implementation platform('com.google.firebase:firebase-bom:34.17.0')
     implementation 'com.google.firebase:firebase-analytics'
 }
